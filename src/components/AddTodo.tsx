@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Input from "@mui/material/Input";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
+import EditIcon from "@mui/icons-material/Edit";
 
 function App() {
     const [value, setValue] = useState<string>("");
@@ -32,6 +33,13 @@ function App() {
         ];
         setTasks(copyTasks);
     };
+
+    const editTask = (index: number): void => {
+        let copyTasks = [...tasks];
+        [copyTasks[index]][0].text = 'ВМЕСТЕ ЛЕГЧЕ'
+        setTasks(copyTasks)
+        
+    }
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
@@ -65,19 +73,48 @@ function App() {
                             task.done ? "todoItemDone" : ""
                         }`}
                     >
-                        {task.done && <DoneIcon />}
+                        <div className="taskContent">
+                            {task.done && <DoneIcon />}
 
-                        {task.text}
-                        
-                        <Button
-                            className="deleteBtn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                deleteTask(index);
-                            }}
-                        >
-                            <DeleteIcon />
-                        </Button>
+                            {task.text}
+                        </div>
+                        <div className="buttons">
+                            <Button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    editTask(index);
+                                }}
+                                className="editBtn"
+                                sx={{
+                                    marginLeft: "auto",
+                                    minWidth: "unset",
+                                    padding: 0,
+                                    background: "none",
+                                    border: "none",
+                                    color: "red",
+                                }}
+                            >
+                                <EditIcon />
+                            </Button>
+
+                            <Button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteTask(index);
+                                }}
+                                className="deleteBtn"
+                                sx={{
+                                    marginLeft: "auto",
+                                    minWidth: "unset",
+                                    padding: 0,
+                                    background: "none",
+                                    border: "none",
+                                    color: "white",
+                                }}
+                            >
+                                <DeleteIcon />
+                            </Button>
+                        </div>
                     </li>
                 ))}
             </ul>

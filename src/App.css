@@ -43,7 +43,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
     color: #213547;
     background-color: #213547;
@@ -56,6 +56,8 @@ button:focus-visible {
   }
 }
 
+
+
 .todoList{
   margin-top: 20px;
   list-style-type: none;
@@ -66,7 +68,7 @@ button:focus-visible {
 
 }
 
-.todoItem{
+/* .todoItem{
   height: 4rem;
   text-align: left;
   padding-left: 12px;
@@ -74,13 +76,28 @@ button:focus-visible {
   border-radius: 4px;
   cursor: pointer;
   background: #8F9685;
+
+} */
+
+.todoItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 14px;
+  height: 4rem;
+  background: #8F9685;
+  border-radius: 4px;
 }
+
 
 .todoItem:hover{
   background: #686d60;
+}
+
+.taskContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .todoItemDone{
@@ -92,15 +109,18 @@ button:focus-visible {
 }
 
 .deleteBtn {
-  background: none;
-  border: none;
-  font-size: 18px;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  color: white;
+  transition: opacity 0.5s ease;
+}
+
+.deleteBtn:hover{
+  opacity: 1;
 }
 
 .todoItem:hover .deleteBtn {
   opacity: 1;
+}
+
+.buttons{
+
 }
