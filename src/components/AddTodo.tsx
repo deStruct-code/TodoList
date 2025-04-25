@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useEffect} from "react";
 import "../App.css";
 import Button from "@mui/material/Button";
 import Input from "@mui/material/Input";
@@ -8,38 +9,67 @@ import EditIcon from "@mui/icons-material/Edit";
 
 function App() {
     const [value, setValue] = useState<string>("");
-    const [tasks, setTasks] = useState<Array<{text: string; done: boolean}>>(
-        []
-    );
+    const [tasks, setTasks] = useState<
+        Array<{text: string; isDone: boolean; isEditing?: boolean}>
+    >([]);
+
+    useEffect(() => {
+        const savedTasks = localStorage.getItem("tasks");
+        if (savedTasks) {
+            setTasks(JSON.parse(savedTasks));
+        }
+    }, []);
 
     const addTask = (): void => {
         if (value.trim() !== "") {
-            setTasks([...tasks, {text: value, done: false}]);
+            const newTasks = [...tasks, {text: value, isDone: false}];
+            setTasks(newTasks);
+            localStorage.setItem("tasks", JSON.stringify(newTasks));
             setValue("");
         }
     };
 
     const toggleTask = (index: number): void => {
         const copyTasks = [...tasks];
-        copyTasks[index] = {...copyTasks[index], done: !copyTasks[index].done};
+        copyTasks[index] = {
+            ...copyTasks[index],
+            isDone: !copyTasks[index].isDone,
+        };
         setTasks(copyTasks);
+        localStorage.setItem("tasks", JSON.stringify(copyTasks));
     };
 
     const deleteTask = (index: number): void => {
-        let copyTasks = [...tasks];
-        copyTasks = [
-            ...copyTasks.slice(0, index),
-            ...copyTasks.slice(index + 1),
-        ];
-        setTasks(copyTasks);
+        const updatedTasks = tasks.filter((_, i) => i !== index);
+        setTasks(updatedTasks);
+        localStorage.setItem("tasks", JSON.stringify(updatedTasks));
     };
 
-    const editTask = (index: number): void => {
-        let copyTasks = [...tasks];
-        [copyTasks[index]][0].text = 'ВМЕСТЕ ЛЕГЧЕ'
-        setTasks(copyTasks)
-        
-    }
+    const editTask = (index: number) => {
+
+            const updatedTasks = tasks.map((task, i) =>
+                i === index ? {...task, isEditing: true} : task
+            );
+
+            setTasks(updatedTasks);
+
+            localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+
+    };
+
+    const saveEditedTask = (index: number, editedText: string) => {
+        setTasks((prev) =>
+            prev.map((task, i) =>
+                i === index
+                    ? {
+                          ...task,
+                          text: editedText.trim() || task.text,
+                          isEditing: false,
+                      }
+                    : task
+            )
+        );
+    };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
@@ -70,14 +100,42 @@ function App() {
                         key={index}
                         onClick={() => toggleTask(index)}
                         className={`todoItem ${
-                            task.done ? "todoItemDone" : ""
+                            task.isDone ? "todoItemDone" : ""
                         }`}
                     >
                         <div className="taskContent">
-                            {task.done && <DoneIcon />}
-
-                            {task.text}
+                            {task.isEditing ? (
+                                <input
+                                    type="text"
+                                    value={task.text}
+                                    onChange={(e) => {
+                                        const newText = e.target.value;
+                                        setTasks((prev) =>
+                                            prev.map((t, i) =>
+                                                i === index
+                                                    ? {...t, text: newText}
+                                                    : t
+                                            )
+                                        );
+                                    }}
+                                    onBlur={() =>
+                                        saveEditedTask(index, task.text)
+                                    }
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            saveEditedTask(index, task.text);
+                                        }
+                                    }}
+                                    autoFocus
+                                />
+                            ) : (
+                                <>
+                                    {task.isDone && <DoneIcon />}
+                                    {task.text}
+                                </>
+                            )}
                         </div>
+
                         <div className="buttons">
                             <Button
                                 onClick={(e) => {
