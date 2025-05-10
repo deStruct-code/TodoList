@@ -9,66 +9,99 @@ import EditIcon from "@mui/icons-material/Edit";
 
 function App() {
     const [value, setValue] = useState<string>("");
-    const [tasks, setTasks] = useState<
-        Array<{text: string; isDone: boolean; isEditing?: boolean}>
-    >([]);
+    const [tasks, setTasks] = useState<Todo[]>([]);
+    const [sortDirection, setSortDirection] = useState<"new" | "old">("old");
+
+
+    interface Todo {
+        id: number;
+        text: string;
+        completed: boolean;
+        isEditing?: boolean;
+    }
 
     useEffect(() => {
         const savedTasks = localStorage.getItem("tasks");
         if (savedTasks) {
-            setTasks(JSON.parse(savedTasks));
+            try {
+                const parsedTasks = JSON.parse(savedTasks);
+                if (Array.isArray(parsedTasks)) {
+                    setTasks(parsedTasks);
+                } else {
+                    setTasks([]); 
+                }
+            } catch (e) {
+                setTasks([]); 
+            }
         }
     }, []);
 
     const addTask = (): void => {
         if (value.trim() !== "") {
-            const newTasks = [...tasks, {text: value, isDone: false}];
+            const newTask: Todo = {
+                id: Date.now(),
+                text: value,
+                completed: false,
+            };
+
+            const newTasks = [...tasks, newTask];
             setTasks(newTasks);
             localStorage.setItem("tasks", JSON.stringify(newTasks));
             setValue("");
         }
     };
 
-    const toggleTask = (index: number): void => {
-        const copyTasks = [...tasks];
-        copyTasks[index] = {
-            ...copyTasks[index],
-            isDone: !copyTasks[index].isDone,
-        };
-        setTasks(copyTasks);
-        localStorage.setItem("tasks", JSON.stringify(copyTasks));
+    const toggleTask = (id: number): void => {
+        const copyTasks = [...tasks]; 
+        const taskIndex = copyTasks.findIndex((task) => task.id === id); 
+    
+        if (taskIndex !== -1) {
+            copyTasks[taskIndex] = {
+                ...copyTasks[taskIndex],
+                completed: !copyTasks[taskIndex].completed, 
+            };
+            setTasks(copyTasks); 
+            localStorage.setItem("tasks", JSON.stringify(copyTasks)); 
+        }
     };
 
-    const deleteTask = (index: number): void => {
-        const updatedTasks = tasks.filter((_, i) => i !== index);
+    const deleteTask = (id: number): void => {
+        const updatedTasks = tasks.filter((task) => task.id !== id); 
+        setTasks(updatedTasks); 
+        localStorage.setItem("tasks", JSON.stringify(updatedTasks)); 
+    };
+
+    const editTask = (id: number): void => {
+        const updatedTasks = tasks.map((task) =>
+            task.id === id ? {...task, isEditing: true} : task 
+        );
+    
         setTasks(updatedTasks);
-        localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+        localStorage.setItem("tasks", JSON.stringify(updatedTasks)); 
     };
 
-    const editTask = (index: number) => {
-
-            const updatedTasks = tasks.map((task, i) =>
-                i === index ? {...task, isEditing: true} : task
-            );
-
-            setTasks(updatedTasks);
-
-            localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-
-    };
-
-    const saveEditedTask = (index: number, editedText: string) => {
+    const saveEditedTask = (id: number, editedText: string): void => {
         setTasks((prev) =>
-            prev.map((task, i) =>
-                i === index
+            prev.map((task) =>
+                task.id === id 
                     ? {
                           ...task,
-                          text: editedText.trim() || task.text,
-                          isEditing: false,
+                          text: editedText.trim() || task.text, 
+                          isEditing: false, 
                       }
                     : task
             )
         );
+    };
+
+    const sortByID = () => {
+        const newDirection = sortDirection === "new" ? "old" : "new";
+        const sorted = [...tasks].sort((a, b) =>
+            newDirection === "new" ? b.id - a.id : a.id - b.id
+        );
+
+        setSortDirection(newDirection);
+        setTasks(sorted);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -82,7 +115,6 @@ function App() {
             <Input
                 type="text"
                 className="input"
-                color="primary"
                 value={value}
                 onChange={(e) => {
                     setValue(e.target.value);
@@ -94,13 +126,18 @@ function App() {
                 Add Task
             </Button>
 
+            <Button className="button" onClick={sortByID} variant="contained">
+                Sort {sortDirection === "new" ? "↑" : "↓"}
+            </Button>
+
             <ul className="todoList">
-                {tasks.map((task, index) => (
+                {Array.isArray(tasks) && tasks.map((task) => (
+
                     <li
-                        key={index}
-                        onClick={() => toggleTask(index)}
+                        key={task.id}
+                        onClick={() => toggleTask(task.id)}
                         className={`todoItem ${
-                            task.isDone ? "todoItemDone" : ""
+                            task.completed ? "todoItemDone" : ""
                         }`}
                     >
                         <div className="taskContent">
@@ -111,26 +148,26 @@ function App() {
                                     onChange={(e) => {
                                         const newText = e.target.value;
                                         setTasks((prev) =>
-                                            prev.map((t, i) =>
-                                                i === index
+                                            prev.map((t) =>
+                                                t.id === task.id
                                                     ? {...t, text: newText}
                                                     : t
                                             )
                                         );
                                     }}
                                     onBlur={() =>
-                                        saveEditedTask(index, task.text)
+                                        saveEditedTask(task.id, task.text)
                                     }
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {
-                                            saveEditedTask(index, task.text);
+                                            saveEditedTask(task.id, task.text);
                                         }
                                     }}
                                     autoFocus
                                 />
                             ) : (
                                 <>
-                                    {task.isDone && <DoneIcon />}
+                                    {task.completed && <DoneIcon />}
                                     {task.text}
                                 </>
                             )}
@@ -140,7 +177,7 @@ function App() {
                             <Button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    editTask(index);
+                                    editTask(task.id);
                                 }}
                                 className="editBtn"
                                 sx={{
@@ -149,7 +186,7 @@ function App() {
                                     padding: 0,
                                     background: "none",
                                     border: "none",
-                                    color: "red",
+                                    color: "#F8EEDF",
                                 }}
                             >
                                 <EditIcon />
@@ -158,7 +195,7 @@ function App() {
                             <Button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    deleteTask(index);
+                                    deleteTask(task.id);
                                 }}
                                 className="deleteBtn"
                                 sx={{
@@ -167,7 +204,7 @@ function App() {
                                     padding: 0,
                                     background: "none",
                                     border: "none",
-                                    color: "white",
+                                    color: "#F8EEDF",
                                 }}
                             >
                                 <DeleteIcon />

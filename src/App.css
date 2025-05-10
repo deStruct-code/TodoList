@@ -1,60 +1,57 @@
-
-
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
 }
 
-.mainText{
-  margin-bottom: 20px;
+.mainText {
+    margin-bottom: 20px;
 }
 
-.todo{
-  border-radius: 8px;
+.todo {
+    border-radius: 8px;
 }
-.input{
-  background: #6f8587;
-  height: 34px;
-  border: 3px solid transparent;
-  padding-left: 1rem;
-  color: #213547;
-  border-radius: 8px;
+.input {
+    background: #6f8587;
+    height: 34px;
+    border: 3px solid transparent;
+    padding-left: 1rem;
+    color: #F8EEDF; 
+    border-radius: 8px;
 }
-.input::placeholder { color: #f9f9f9; } 
+.input::placeholder {
+    color: #F8EEDF;
+}
 
 button:hover {
-  border-color: #213547;
+    border-color: #213547;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #3e3e40;
-    background-color:  #2e2e30;
-  }
-  a:hover {
-    color: #213547
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    :root {
+        color: #1a1a1d;
+        background-color: #2e2e30;
+    }
+    a:hover {
+        color: #1a1a1d;
+    }
+    button {
+        background-color: #F8EEDF;
+    }
 }
 
+.todoList {
+    margin-top: 20px;
+    list-style-type: none;
+    font-weight: bold;
+    color: #F8EEDF;
 
-
-.todoList{
-  margin-top: 20px;
-  list-style-type: none;
-  font-weight: bold;
-  color: #1a1a1a;
-
-  border-radius: 4px;
-
+    border-radius: 4px;
 }
 
 /* .todoItem{
@@ -69,47 +66,43 @@ button:focus-visible {
 } */
 
 .todoItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 14px;
-  height: 4rem;
-  background: #8F9685;
-  border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 14px;
+    height: 4rem;
+    background: #a64d79;
+    border-radius: 4px;
 }
 
-
-.todoItem:hover{
-  background: #686d60;
+.todoItem:hover {
+    background: #6a1e55;
 }
 
 .taskContent {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.todoItemDone{
-  background: #7ab32c;
+.todoItemDone {
+    background: #7ab32c;
 }
 
-.todoItemDone:hover{
-  background: #639124;
+.todoItemDone:hover {
+    background: #639124;
 }
 
 .deleteBtn {
-  cursor: pointer;
-  transition: opacity 0.5s ease;
+    cursor: pointer;
+    transition: opacity 0.5s ease;
 }
 
-.deleteBtn:hover{
-  opacity: 1;
+.deleteBtn:hover {
+    opacity: 1;
 }
 
 .todoItem:hover .deleteBtn {
-  opacity: 1;
+    opacity: 1;
 }
 
-.buttons{
-
-}
